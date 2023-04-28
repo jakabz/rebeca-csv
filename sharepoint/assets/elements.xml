@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Elements xmlns="http://schemas.microsoft.com/sharepoint/">
+    <CustomAction
+        Title="CsvExport"
+        RegistrationId="100"
+        RegistrationType="List"
+        Location="ClientSideExtension.ListViewCommandSet.CommandBar"
+        ClientSideComponentId="b5b7b000-a95d-432a-9fa9-28fb1b3590a2"
+        ClientSideComponentProperties="{&quot;enablelistview&quot;: [{&quot;viewId&quot;: &quot;61DF107F-7F59-4E8C-B19D-1B83B506A3B3&quot;, &quot;spGroupsTitle&quot;:[&quot;REBECA_HQ TR&quot;], &quot;templateType&quot;:&quot;offices&quot;, &quot;templateCSV&quot;: &quot;offices.csv&quot;},{&quot;viewId&quot;: &quot;73242BEB-0071-40BB-9EFB-38471DAD7092&quot;, &quot;spGroupsTitle&quot;:[&quot;REBECA_HQ TR&quot;], &quot;templateType&quot;:&quot;subsidiaries&quot;, &quot;templateCSV&quot;: &quot;subsidiaries.csv&quot;}]}">
+    </CustomAction>
+</Elements>

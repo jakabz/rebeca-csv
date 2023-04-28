@@ -1,0 +1,17 @@
+{
+  "@microsoft/generator-sharepoint": {
+    "plusBeta": false,
+    "isCreatingSolution": true,
+    "version": "1.15.2",
+    "libraryName": "rebeca-csv-export",
+    "libraryId": "c3ba7184-8d8e-45e4-8da0-af8cfe5f891c",
+    "environment": "spo",
+    "packageManager": "npm",
+    "solutionName": "rebeca-csv-export",
+    "solutionShortDescription": "rebeca-csv-export description",
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "componentType": "extension",
+    "extensionType": "ListViewCommandSet"
+  }
+}

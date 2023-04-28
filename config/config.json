@@ -1,0 +1,18 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/config.2.0.schema.json",
+  "version": "2.0",
+  "bundles": {
+    "csv-export-command-set": {
+      "components": [
+        {
+          "entrypoint": "./lib/extensions/csvExport/CsvExportCommandSet.js",
+          "manifest": "./src/extensions/csvExport/CsvExportCommandSet.manifest.json"
+        }
+      ]
+    }
+  },
+  "externals": {},
+  "localizedResources": {
+    "CsvExportCommandSetStrings": "lib/extensions/csvExport/loc/{locale}.js"
+  }
+}

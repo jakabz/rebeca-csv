@@ -1,0 +1,35 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/spfx-serve.schema.json",
+  "port": 4321,
+  "https": true,
+  "serveConfigurations": {
+    "default": {
+      "pageUrl": "https://egisglobal.sharepoint.com/sites/RebecaTest/Lists/ClosingBalances/RepOfficeCompleted.aspx",
+      "customActions": {
+        "b5b7b000-a95d-432a-9fa9-28fb1b3590a2": {
+          "location": "ClientSideExtension.ListViewCommandSet.CommandBar",
+          "properties": {
+            "enablelistview": [
+              {"viewId": "61DF107F-7F59-4E8C-B19D-1B83B506A3B3", "spGroupsTitle":["REBECA_HQ TR"], "templateType":"offices", "templateCSV": "offices.csv"},
+              {"viewId": "73242BEB-0071-40BB-9EFB-38471DAD7092", "spGroupsTitle":["REBECA_HQ TR"], "templateType":"subsidiaries", "templateCSV": "subsidiaries.csv"}
+            ]
+          }
+        }
+      }
+    },
+    "csvExport": {
+      "pageUrl": "https://egisglobal.sharepoint.com/sites/RebecaTest/Lists/ClosingBalances/RepOfficeCompleted.aspx",
+      "customActions": {
+        "b5b7b000-a95d-432a-9fa9-28fb1b3590a2": {
+          "location": "ClientSideExtension.ListViewCommandSet.CommandBar",
+          "properties": {
+            "enablelistview": [
+              {"viewId": "61DF107F-7F59-4E8C-B19D-1B83B506A3B3", "spGroupsTitle":["REBECA_HQ TR"], "templateType":"offices", "templateCSV": "offices.csv"},
+              {"viewId": "73242BEB-0071-40BB-9EFB-38471DAD7092", "spGroupsTitle":["REBECA_HQ TR"], "templateType":"subsidiaries", "templateCSV": "subsidiaries.csv"}
+            ]
+          }
+        }
+      }
+    }
+  }
+}
