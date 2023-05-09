@@ -8,16 +8,22 @@ import {
 import * as React from 'react';
 import generateCSVdata from './generateCSVdata';
 import SPListViewService from './listService/listService';
-import { CSVLink, CSVDownload } from "react-csv";
+import { CSVLink } from "react-csv";
 import * as ReactDom from 'react-dom';
 import { format } from 'date-fns';
-
+import * as iconv from 'iconv-lite';
 
 let currentViewId: string = '';
 
+export interface IEnableListView {
+  viewId: string;
+  spGroupsTitle: string[];
+  templateType: 'offices' | 'subsidiaries';
+  templateCSV: string;
+}
+
 export interface ICsvExportCommandSetProperties {
-  enablelistview: any[];
-  viewItems: any[];
+  enablelistview: IEnableListView[];
 }
 
 export default class CsvExportCommandSet extends BaseListViewCommandSet<ICsvExportCommandSetProperties> {
@@ -26,10 +32,10 @@ export default class CsvExportCommandSet extends BaseListViewCommandSet<ICsvExpo
     const compareOneCommand: Command = this.tryGetCommand('COMMAND_1');
     currentViewId = this.context.listView.view.id.toString();
     let showInView: boolean = false;
-    for (var index in this.properties.enablelistview) {
-      const isMember: boolean = await SPListViewService.isGroupMember(this.properties.enablelistview[index].spGroupsTitle);
+    for (const listView of this.properties.enablelistview) {
+      const isMember: boolean = await SPListViewService.isGroupMember(listView.spGroupsTitle);
       if (isMember) {
-        if (this.properties.enablelistview[index].viewId.toUpperCase() === currentViewId.toUpperCase()) {
+        if (listView.viewId.toUpperCase() === currentViewId.toUpperCase()) {
           showInView = true;
         }
       }
@@ -54,10 +60,10 @@ export default class CsvExportCommandSet extends BaseListViewCommandSet<ICsvExpo
   private _onListViewStateChanged = async (args: ListViewStateChangedEventArgs): Promise<void> => {
     currentViewId = this.context.listView.view.id.toString();
     let showInView: boolean = false;
-    for (var index in this.properties.enablelistview) {
-      const isMember: boolean = await SPListViewService.isGroupMember(this.properties.enablelistview[index].spGroupsTitle);
+    for (const listView of this.properties.enablelistview) {
+      const isMember: boolean = await SPListViewService.isGroupMember(listView.spGroupsTitle);
       if (isMember) {
-        if (this.properties.enablelistview[index].viewId.toUpperCase() === currentViewId.toUpperCase()) {
+        if (listView.viewId.toUpperCase() === currentViewId.toUpperCase()) {
           showInView = true;
         }
       }
@@ -68,7 +74,7 @@ export default class CsvExportCommandSet extends BaseListViewCommandSet<ICsvExpo
     this.raiseOnChange();
   }
 
-  public fetchCSV = async (file: string) => {
+  public fetchCSV = async (file: string): Promise<string> => {
     const response = await fetch(this.context.pageContext.legacyPageContext.webAbsoluteUrl + '/SiteAssets/' + file, {
       credentials: 'include',
       headers: {
@@ -79,7 +85,7 @@ export default class CsvExportCommandSet extends BaseListViewCommandSet<ICsvExpo
     return data;
   }
 
-  public processCSV = (str: string, delim = ',') => {
+  public processCSV = (str: string, delim = ','): string[][] => {
     const rows = str.split("\n");
     const arr = rows.map(function (row) {
       const values = row.split(delim);
@@ -88,28 +94,54 @@ export default class CsvExportCommandSet extends BaseListViewCommandSet<ICsvExpo
     return arr;
   }
 
-  private csvExportClicks = () => {
+  private csvExportClicks = (): void => {
     const viewItems: readonly RowAccessor[] = this.context.listView.rows;
     const viewItemIds = viewItems.map(row => row.getValueByName('ID'));
     const settingViewItem = this.properties.enablelistview.find(p => p.viewId.toUpperCase() === currentViewId.toUpperCase());
-    this.fetchCSV(settingViewItem.templateCSV).then(async result => {
-      const templateData = this.processCSV(result, ';');
-      const csvData = await generateCSVdata(viewItemIds, templateData, settingViewItem.templateType);
+    const fileName: string = `${settingViewItem.templateType}-${format(new Date(), 'yyyy.MM.dd.hh:mm:ss')}.csv`;
 
-      const element = React.createElement(CSVLink, {
-        data: csvData,
-        filename: `${settingViewItem.templateType}-${format(new Date(), 'yyyy.MM.dd.hh:mm:ss')}.csv`,
-        separator: ";",
-        enclosingCharacter: ``,
-        uFEFF: false
-      }, 'download');
-      let downloadContainer: HTMLElement = document.createElement('div');
-      downloadContainer.setAttribute('id', 'downloadContainer');
-      ReactDom.render(element, downloadContainer);
+    this.fetchCSV(settingViewItem.templateCSV)
+      .then(async result => {
+        const templateData = this.processCSV(result, ';');
+        const csvData = await generateCSVdata(viewItemIds, templateData, settingViewItem.templateType);
 
-      (downloadContainer.querySelector("a") as HTMLElement).click();
+        const element = React.createElement(CSVLink, {
+          data: csvData,
+          filename: fileName,
+          separator: ";",
+          enclosingCharacter: ``,
+          uFEFF: false
+        }, 'download');
 
-      //console.info(csvData);
-    });
+        const downloadContainer: HTMLElement = document.createElement('div');
+        downloadContainer.setAttribute('id', 'downloadContainer');
+        ReactDom.render(element, downloadContainer);
+
+        // (downloadContainer.querySelector("a") as HTMLElement).click();
+        await this.downloadCsvAsANSI(downloadContainer, fileName);
+
+        // Unmount component to avoid memory leaks.
+        ReactDom.unmountComponentAtNode(downloadContainer);
+
+      })
+      .catch(error => console.error('Error (fetchCSV): ', error));
+  }
+
+  private downloadCsvAsANSI = (container: HTMLElement, fileName: string): void => {
+    const bloblUrl: string = (container.querySelector('a') as HTMLAnchorElement)?.href;
+    fetch(bloblUrl)
+      .then(async (result) => {
+        let resultText: string = await result.text();
+        resultText = iconv.encode(resultText, 'win1252');
+
+        const filData = new Blob([resultText], { type: 'text/csv' });
+        const filUrl = URL.createObjectURL(filData);
+
+        const link: HTMLAnchorElement = document.createElement("a");
+        link.href = filUrl;
+        link.download = fileName;
+        link.click();
+      })
+      .catch(error => console.error('Error (downloadCsvAsANSI): ', error));
   }
 }
