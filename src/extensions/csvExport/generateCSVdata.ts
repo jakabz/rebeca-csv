@@ -9,20 +9,34 @@ const generateCSVdata = async (viewItemIds: string[], templateData: any[], templ
         const csvName: string = templateRow[13];
         const currency: string = templateRow[8];
         let result: number = 0;
-        if (savedRows.indexOf(csvName + currency) === -1) {
+        if (savedRows.indexOf(csvName + currency + (templateRow[14].indexOf('betét') > -1 ? 'betet' : 'iroda'))) {
             listItems.forEach(item => {
                 if (item.Affiliate.CSVName === csvName && item.Currency.Title === currency) {
                     if (templateRow[14].indexOf('betét') > -1) {
                         result = result + item.BankDeposit;
-                    } else {
+                    } else if (templateRow[6] === "PÉNZÁLL") {
                         result = result + (item.CurrentAccounts + item.CashOnHandAndCheques);
+                    }
+                }
+                if (item.Affiliate.CSVName === csvName && item.Currency2.Title === currency) {
+                    if (templateRow[14].indexOf('betét') > -1) {
+                        result = result + item.BankDeposit2;
+                    } else if (templateRow[6] === "PÉNZÁLL") {
+                        result = result + (item.CurrentAccounts2 + item.CashOnHandAndCheques2);
+                    }
+                }
+                if (item.Affiliate.CSVName === csvName && item.Currency3.Title === currency) {
+                    if (templateRow[14].indexOf('betét') > -1) {
+                        result = result + item.BankDeposit3;
+                    } else if (templateRow[6] === "PÉNZÁLL") {
+                        result = result + (item.CurrentAccounts3 + item.CashOnHandAndCheques3);
                     }
                 }
                 templateRow[3] = format(new Date(item.DateOfBalance), 'yyyy.MM.dd');
                 templateRow[4] = format(new Date(item.DateOfBalance), 'yyyy.MM.dd');
                 templateRow[5] = format(new Date(item.DateOfBalance), 'yyyy.MM.dd');
             });
-            savedRows.push(csvName + currency);
+            savedRows.push(csvName + currency + (templateRow[14].indexOf('betét') > -1 ? 'betet' : 'iroda'));
         }
         if (result === 0) {
             templateRow[7] = "1";

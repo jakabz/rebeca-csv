@@ -55,19 +55,23 @@ export class listService {
     public async getListItems(itemIDs:string[]):Promise<any[]> {
         return new Promise<any[]>((resolve, reject) => {
             try{
-                let filter = "";
-                itemIDs.forEach((itemID:string, index:number) => {
-                    if(index === itemIDs.length - 1){
-                        filter += `ID eq ${itemID}`
-                    } else {
-                        filter += `ID eq ${itemID} or `
-                    }
-                });
-                const select = '*, Affiliate/ID, Affiliate/Title, Affiliate/CSVName, Affiliate/TipusText, Currency/ID, Currency/Title';
-                const expand = 'Affiliate, Currency';
-                sp.web.lists.getByTitle("Weekly closing balance report").items.filter(filter).select(select).expand(expand).get().then((items) => {
-                    resolve(items);
-                })
+                if(itemIDs.length > 0){
+                    let filter = "";
+                    itemIDs.forEach((itemID:string, index:number) => {
+                        if(index === itemIDs.length - 1){
+                            filter += `ID eq ${itemID}`
+                        } else {
+                            filter += `ID eq ${itemID} or `
+                        }
+                    });
+                    const select = '*, Affiliate/ID, Affiliate/Title, Affiliate/CSVName, Affiliate/TipusText, Currency/ID, Currency/Title, Currency2/ID, Currency2/Title, Currency3/ID, Currency3/Title, Currency4/ID, Currency4/Title, Currency5/ID, Currency5/Title';
+                    const expand = 'Affiliate, Currency, Currency2, Currency3, Currency4, Currency5';
+                    sp.web.lists.getByTitle("Weekly closing balance report").items.filter(filter).select(select).expand(expand).get().then((items) => {
+                        resolve(items);
+                    })
+                } else {
+                    resolve([]);
+                }
             }
             catch (error) {
                 console.log(error);

@@ -96,7 +96,9 @@ export default class CsvExportCommandSet extends BaseListViewCommandSet<ICsvExpo
 
   private csvExportClicks = (): void => {
     const viewItems: readonly RowAccessor[] = this.context.listView.rows;
-    const viewItemIds = viewItems.map(row => row.getValueByName('ID'));
+    const viewItemAllIds = viewItems.map(row => row.getValueByName('ID'));
+    const viewItemIds = [... new Set(viewItemAllIds)] 
+    //const viewItemIds = viewItemAllIds.filter((item, index) => viewItemAllIds.indexOf(item) === index);
     const settingViewItem = this.properties.enablelistview.find(p => p.viewId.toUpperCase() === currentViewId.toUpperCase());
     const fileName: string = `${settingViewItem.templateType}-${format(new Date(), 'yyyy.MM.dd.hh:mm:ss')}.csv`;
 
