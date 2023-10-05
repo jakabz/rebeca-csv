@@ -1,5 +1,5 @@
 import SPListViewService from "./listService/listService";
-import { format } from 'date-fns'
+import { format } from 'date-fns';
 
 const generateCSVdata = async (viewItemIds: string[], templateData: any[], templateType: string): Promise<any[]> => {
 
@@ -49,17 +49,25 @@ const generateCSVdata = async (viewItemIds: string[], templateData: any[], templ
     const getCurrencySumma = (templateRow: string[], listItems: any[]) => {
         const currency: string = templateRow[8];
         let result: number = 0;
+        let dateOfBalance: Date;
 
-        listItems.forEach(item => {
+        listItems.forEach(item => {    
             if (item.Currency.Title === currency) {
                 result = result + (item.CurrentAccounts + item.CashOnHandAndCheques + item.BankDeposit);
-                
-            }  
-            templateRow[3] = format(new Date(item.DateOfBalance), 'yyyy.MM.dd');
-            templateRow[4] = format(new Date(item.DateOfBalance), 'yyyy.MM.dd');
-            templateRow[5] = format(new Date(item.DateOfBalance), 'yyyy.MM.dd');          
+                dateOfBalance = item.DateOfBalance ? new Date(item.DateOfBalance) : null;
+            }
+            if (item.Currency2.Title === currency) {
+                result = result + (item.CurrentAccounts2 + item.CashOnHandAndCheques2 + item.BankDeposit2);
+                dateOfBalance =  item.DateOfBalance ? new Date(item.DateOfBalance) : null;
+            }
+            if (item.Currency3.Title === currency) {
+                result = result + (item.CurrentAccounts3 + item.CashOnHandAndCheques3 + item.BankDeposit3);
+                dateOfBalance =  item.DateOfBalance ? new Date(item.DateOfBalance) : null;
+            }
         });
-
+        templateRow[3] = dateOfBalance ? format(dateOfBalance, 'yyyy.MM.dd') : "";
+        templateRow[4] = dateOfBalance ? format(dateOfBalance, 'yyyy.MM.dd') : "";
+        templateRow[5] = dateOfBalance ? format(dateOfBalance, 'yyyy.MM.dd') : "";
         if (result === 0) {
             templateRow[7] = "1";
         } else {
